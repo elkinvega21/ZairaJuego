@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRODUCTION GAME</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <style>
+    #minimap {
+      position: fixed;
+      top: 16px;
+      right: 16px;
+      width: 150px;
+      height: 150px;
+      background: rgba(2, 6, 23, 0.7);
+      border: 2px solid var(--border-color);
+      border-radius: 12px;
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      overflow: hidden;
+      display: none;
+    }
+    .hud-screen.active #minimap {
+      display: block;
+    }
+    .mm-dot { position: absolute; width: 6px; height: 6px; border-radius: 50%; transform: translate(-50%, -50%); }
+    .mm-player { background: #3b82f6; width: 8px; height: 8px; box-shadow: 0 0 5px #3b82f6; z-index: 5; }
+    .mm-enemy { background: #f43f5e; z-index: 4; }
+    .mm-station { position: absolute; background: #64748b; width: 12px; height: 12px; transform: translate(-50%, -50%); border-radius: 2px; }
+  </style>
+</head>
+<body>
+
+  <!-- ENTORNO 3D WEBGL -->
+  <div id="world-container">
+    <!-- El canvas de Three.js se inyectará aquí -->
+  </div>
+
+  <!-- UI LAYER -->
+  <div id="ui-layer">
+    
+    <!-- PANTALLA NOMBRE -->
+    <div id="name-screen" class="screen active">
+      <div class="logo-container">
+        <h1 class="logo">PRODUCTION <span>GAME</span></h1>
+        <div class="logo-line"></div>
+      </div>
+      <div class="glass-card name-card">
+        <p>IDENTIFICACIÓN DE OPERARIO</p>
+        <input type="text" id="player-name-input" placeholder="INGRESA TU NOMBRE" maxlength="12">
+        <button class="btn primary" onclick="saveNameAndStart()">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          ENTRAR A LA FÁBRICA
+        </button>
+      </div>
+    </div>
+
+    <!-- PANTALLA MENÚ -->
+    <div id="menu-screen" class="screen hidden">
+      <div class="logo-container">
+        <h1 class="logo">PRODUCTION <span>GAME</span></h1>
+        <div class="logo-line"></div>
+      </div>
+      <div class="level-select glass-card">
+        <h2>SELECCIÓN DE NIVEL</h2>
+        <button class="btn primary" id="btn-lvl-1" onclick="startGame(1)">NIVEL 1: PROYECTO</button>
+        <button class="btn secondary" id="btn-lvl-2" onclick="startGame(2)" disabled>🔒 NIVEL 2: LOTES</button>
+        <button class="btn secondary" id="btn-lvl-3" onclick="startGame(3)" disabled>🔒 NIVEL 3: CONTINUA</button>
+        <button class="btn secondary" id="btn-lvl-4" onclick="startGame(4)" disabled>🔒 NIVEL 4: BAJO PEDIDO</button>
+      </div>
+    </div>
+
+    <!-- MINIMAPA -->
+    <div id="minimap">
+      <div id="mm-player" class="mm-dot mm-player"></div>
+      <div id="mm-content"></div>
+    </div>
+
+    <!-- HUD (IN-GAME) -->
+    <div id="hud-screen" class="screen hud-screen hidden pointer-none">
+      <div class="hud-top pointer-auto">
+        <div class="hud-module">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+          <div>
+            <span class="label">VIDAS</span>
+            <span class="value" id="hud-lives">5</span>
+          </div>
+        </div>
+        <div class="hud-module">
+          <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+          <div>
+            <span class="label">NIVEL</span>
+            <span class="value" id="hud-level">1</span>
+          </div>
+        </div>
+        <div class="hud-module timer-module">
+          <svg viewBox="0 0 24 24" stroke="currentColor"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+          <div>
+            <span class="label">TIEMPO</span>
+            <span class="value" id="hud-time">00</span>
+          </div>
+        </div>
+        <div class="hud-module">
+          <svg viewBox="0 0 24 24" stroke="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+          <div>
+            <span class="label">PUNTOS</span>
+            <span class="value" id="hud-score">0</span>
+          </div>
+        </div>
+      </div>
+      <div class="hud-bottom pointer-none">
+        <button class="btn secondary outline btn-exit pointer-auto" onclick="returnToMenu()">SALIR</button>
+        <div class="mission-panel glass-card pointer-auto">
+          <div id="hud-msg-icon"></div>
+          <div class="mission-info">
+            <span class="label" id="mission-fase">FASE 1 DE 3</span>
+            <div id="hud-msg" class="mission-text">Iniciando sistemas...</div>
+            <div class="progress-bar-container"><div id="mission-progress" class="progress-bar-fill"></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- HINT FLOTANTE -->
+    <div id="interaction-hint" class="hidden"></div>
+
+    <!-- MODAL PREGUNTA -->
+    <div id="question-modal" class="modal hidden pointer-auto">
+      <div class="modal-content glass-card border-alert">
+        <div class="modal-header">
+          <svg class="alert-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0zM12 9v4m0 4h.01"/></svg>
+          <h3>ALERTA DE PRODUCCIÓN</h3>
+        </div>
+        <p id="question-text">Analizando anomalía...</p>
+        <div class="options">
+          <button class="btn secondary" onclick="answerQuestion('A')"><span class="opt-key">A</span> <span id="opt-a">Opción A</span></button>
+          <button class="btn secondary" onclick="answerQuestion('B')"><span class="opt-key">B</span> <span id="opt-b">Opción B</span></button>
+          <button class="btn secondary" onclick="answerQuestion('C')"><span class="opt-key">C</span> <span id="opt-c">Opción C</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL FUSIBLES LINTERNA -->
+    <div id="breaker-modal" class="modal hidden pointer-auto">
+      <div class="modal-content glass-card border-alert">
+        <div class="modal-header">
+          <svg class="alert-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+          <h3>RESTABLECER SISTEMA ELÉCTRICO</h3>
+        </div>
+        <p style="margin-top:1rem; font-weight:bold; font-size:1.1rem; color:var(--accent-cyan);" id="breaker-question">Cargando...</p>
+        <div class="options">
+          <button class="btn secondary" onclick="answerBreaker(true)"><span class="opt-key">V</span> Verdadero</button>
+          <button class="btn secondary" onclick="answerBreaker(false)"><span class="opt-key">F</span> Falso</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- MODAL INSPECTOR -->
+    <div id="inspector-modal" class="modal hidden pointer-auto">
+      <div class="modal-content glass-card border-alert">
+        <div class="modal-header">
+          <svg class="alert-icon" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          <h3>¡INSPECTOR DETECTADO!</h3>
+        </div>
+        <p>Defiende tu proceso respondiendo esta auditoría rápida:</p>
+        <p style="margin-top:1rem; font-weight:bold; font-size:1.1rem; color:var(--accent-cyan);" id="inspector-question">Cargando...</p>
+        <div class="options">
+          <button class="btn secondary" onclick="answerInspector(true)"><span class="opt-key">V</span> Verdadero</button>
+          <button class="btn secondary" onclick="answerInspector(false)"><span class="opt-key">F</span> Falso</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANTALLA FIN -->
+    <div id="end-screen" class="screen hidden">
+      <div class="glass-card end-card" style="text-align: center;">
+        <svg id="end-icon-success" style="width: 64px; height: 64px; color: var(--status-success); margin: 0 auto 1rem; display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+        <svg id="end-icon-fail" style="width: 64px; height: 64px; color: var(--status-error); margin: 0 auto 1rem; display: none;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <h2 id="end-title" style="font-size: 2rem; text-shadow: var(--glow-cyan); margin-bottom: 0.5rem;">ANÁLISIS COMPLETADO</h2>
+        <p id="end-subtitle" style="color: var(--accent-cyan); margin-bottom: 2rem;">¡Excelente trabajo optimizando la producción!</p>
+        <div class="stats" style="margin-bottom: 2rem;">
+          <div class="stat-box">
+            <span class="label">PUNTUACIÓN FINAL</span>
+            <span class="value" id="end-stats" style="font-size: 3rem; color: #fff;">0</span>
+          </div>
+        </div>
+        <button class="btn primary" onclick="returnToMenu()">VOLVER AL SISTEMA</button>
+      </div>
+    </div>
+
+  </div>
+
+  <audio id="bg-music" loop>
+    <source src="https://actions.google.com/sounds/v1/science_fiction/dark_alien_space.ogg" type="audio/ogg">
+  </audio>
+
+  <script src="game.js"></script>
+</body>
+</html>

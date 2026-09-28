@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8"/>
+  <title>Ficha Técnica – Production Game</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Inter',sans-serif;background:#fff;color:#1a1a2e;padding:2cm;font-size:10pt;max-width:21cm;margin:auto}
+    h1{font-family:'Orbitron',monospace;font-size:18pt;color:#0891b2;letter-spacing:.05em;border-bottom:3px solid #0891b2;padding-bottom:.4rem;margin-bottom:1rem}
+    h2{font-family:'Orbitron',monospace;font-size:10pt;color:#6d28d9;margin:1rem 0 .4rem;text-transform:uppercase;letter-spacing:.08em}
+    table{width:100%;border-collapse:collapse;margin-bottom:.5rem}
+    td{padding:.4rem .6rem;border:1px solid #e2e8f0;font-size:9.5pt}
+    td:first-child{font-weight:700;background:#f8fafc;width:30%}
+    .level-grid{display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.3rem}
+    .lvl-box{border:2px solid #e2e8f0;border-radius:8px;padding:.6rem .8rem}
+    .lvl-box h3{font-size:9pt;font-weight:700;color:#0891b2;margin-bottom:.3rem}
+    .lvl-box p{font-size:8.5pt;color:#475569;line-height:1.4}
+    .badge{display:inline-block;background:#ede9fe;color:#6d28d9;border-radius:4px;padding:.15rem .5rem;font-size:8pt;font-weight:700;margin:.15rem}
+    .score-table td{font-size:8.5pt}
+    .score-table .pos{color:#16a34a;font-weight:700}
+    .score-table .neg{color:#dc2626;font-weight:700}
+    footer{margin-top:1.5rem;font-size:8pt;color:#94a3b8;text-align:center;border-top:1px solid #e2e8f0;padding-top:.5rem}
+    @media print{body{padding:1.5cm}}
+  </style>
+</head>
+<body>
+
+<h1>🏭 FICHA TÉCNICA — PRODUCTION GAME</h1>
+
+<table>
+  <tr><td>Nombre del videojuego</td><td><strong>Production Game</strong> – Sistema de Gestión de Producción Industrial</td></tr>
+  <tr><td>Integrantes del grupo</td><td>
+    1. ___________________________________<br>
+    2. ___________________________________<br>
+    3. ___________________________________
+  </td></tr>
+  <tr><td>Herramienta utilizada</td><td>HTML5 + JavaScript (Vanilla) + CSS3 · Ejecutable directamente en navegador web</td></tr>
+  <tr><td>Objetivo del juego</td><td>El jugador administra una empresa industrial y debe cumplir pedidos utilizando cuatro sistemas de producción diferentes, maximizando la puntuación sin desperdicios ni retrasos.</td></tr>
+</table>
+
+<h2>📋 Descripción de los Cuatro Niveles</h2>
+<div class="level-grid">
+  <div class="lvl-box">
+    <h3>🏗️ Nivel 1 – Producción por Proyecto</h3>
+    <p>El jugador construye una <strong>Planta Embotelladora</strong> (producto único) completando 6 etapas en orden: Diseño → Cimentación → Maquinaria → Sistemas Eléctricos → Control de Calidad → Entrega. Cada etapa consume tiempo, dinero y materiales. Hay una fecha límite de 90 segundos y un bonus por entrega a tiempo.</p>
+  </div>
+  <div class="lvl-box">
+    <h3>📦 Nivel 2 – Producción por Lotes</h3>
+    <p>Se generan pedidos de lotes con cantidades específicas de productos (laptops, smartphones, tablets, monitores). El jugador debe fabricar <strong>exactamente</strong> las unidades solicitadas antes de entregar. Producir de más o el producto equivocado genera penalizaciones. Se requieren 3 lotes correctos.</p>
+  </div>
+  <div class="lvl-box">
+    <h3>🔄 Nivel 3 – Producción Continua</h3>
+    <p>El jugador mantiene una línea de 5 estaciones activa (Materias → Proceso → Calidad → Empaque → Envío). La materia prima se consume constantemente y la eficiencia cae. Un <strong>Sensor IA con Dashboard</strong> lanza alertas automáticas. El jugador debe reabastecer y reparar para evitar paradas. Duración: 120 segundos.</p>
+  </div>
+  <div class="lvl-box">
+    <h3>🎯 Nivel 4 – Producción Bajo Pedido</h3>
+    <p>Clientes solicitan computadores con especificaciones exactas (ej: "2 con RAM 16GB + SSD 512GB, 1 con RAM 32GB"). El jugador ensambla los componentes correctos desde un estante. La <strong>IA verifica</strong> el pedido y genera un <strong>Código QR</strong> de trazabilidad. Se deben completar 3 pedidos de clientes.</p>
+  </div>
+</div>
+
+<h2>💻 Tecnología Digital Incorporada</h2>
+<table>
+  <tr><td>🤖 Inteligencia Artificial (Sensor IA)</td><td>En Nivel 3, un sistema IA monitorea en tiempo real el nivel de materias primas y eficiencia, generando alertas automáticas cuando los recursos caen por debajo de umbrales críticos. Simula la automatización de procesos industriales con sensores IoT.</td></tr>
+  <tr><td>📊 Dashboard de Producción</td><td>Panel visual con gauges (barras de progreso animadas) que muestran en tiempo real: % de materia prima, % de eficiencia y unidades producidas. Presente en el Nivel 3.</td></tr>
+  <tr><td>📱 Código QR de Trazabilidad</td><td>En Nivel 4, cada pedido genera un Código QR único (simulado visualmente) que representa la digitalización del sistema de pedidos, conectando al cliente con el proceso de producción.</td></tr>
+  <tr><td>💾 Base de Datos Local</td><td>Sistema de puntuación persistente mediante localStorage del navegador. Guarda las mejores puntuaciones entre sesiones y muestra un leaderboard en el menú principal.</td></tr>
+  <tr><td>🔄 Inventario Automático IA</td><td>En Nivel 2, el sistema IA analiza continuamente el inventario vs. el pedido y sugiere qué productos fabricar, cuántos faltan y qué está en exceso, simulando un sistema ERP de control de inventario.</td></tr>
+</table>
+
+<h2>⭐ Sistema de Puntuación</h2>
+<table class="score-table">
+  <tr><td width="50%"><span class="pos">+10</span> Etapa de proyecto completada</td><td><span class="pos">+20</span> Pedido entregado a tiempo / lote perfecto</td></tr>
+  <tr><td><span class="pos">+5</span> Ciclo de producción continua</td><td><span class="pos">+30</span> Pedido bajo pedido perfecto</td></tr>
+  <tr><td><span class="neg">−10</span> Exceso o defecto de producción</td><td><span class="neg">−20</span> Pedido incorrecto / componente erróneo</td></tr>
+  <tr><td><span class="neg">−20</span> Parada de línea de producción</td><td><span class="neg">−30</span> Retraso (tiempo agotado sin completar)</td></tr>
+</table>
+
+<h2>🏆 Condición de Victoria</h2>
+<table>
+  <tr><td>Condición mínima</td><td>Completar los 4 niveles con puntuación total ≥ 200 puntos</td></tr>
+  <tr><td>Calificaciones</td><td>
+    <span class="badge">⭐ Aprendiz Industrial: 0–199 pts</span>
+    <span class="badge">🥈 Supervisor: 200–399 pts</span>
+    <span class="badge">🥇 Gerente de Planta: 400–599 pts</span>
+    <span class="badge">🏆 Experto: 600+ pts</span>
+  </td></tr>
+</table>
+
+<footer>
+  Production Game · Actividad Práctica "Production Game" · Administración de Operaciones y Producción · 2026
+</footer>
+
+</body>
+</html>
